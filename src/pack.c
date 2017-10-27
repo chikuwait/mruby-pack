@@ -13,7 +13,7 @@
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>
-#include <stdio.h>
+#include <printf.h>
 #include <string.h>
 
 struct tmpl {
@@ -209,13 +209,13 @@ unpack_l(mrb_state *mrb, const unsigned char *src, int srclen, mrb_value ary, un
   }
   if (flags & PACK_FLAG_SIGNED) {
     int32_t sl = ul;
-    if (!FIXABLE(sl)) {
+    if (!FIXABLE(i32_to_f64(sl))) {
       snprintf(msg, sizeof(msg), "cannot unpack to Fixnum: %ld", (long)sl);
       mrb_raise(mrb, E_RANGE_ERROR, msg);
     }
     n = sl;
   } else {
-    if (!POSFIXABLE(ul)) {
+    if (!POSFIXABLE(ui32_to_f64(ul))) {
       snprintf(msg, sizeof(msg), "cannot unpack to Fixnum: %lu", (unsigned long)ul);
       mrb_raise(mrb, E_RANGE_ERROR, msg);
     }
@@ -275,13 +275,13 @@ unpack_q(mrb_state *mrb, const unsigned char *src, int srclen, mrb_value ary, un
   }
   if (flags & PACK_FLAG_SIGNED) {
     int64_t sll = ull;
-    if (!FIXABLE(sll)) {
+    if (!FIXABLE(i64_to_f64(sll))) {
       snprintf(msg, sizeof(msg), "cannot unpack to Fixnum: %lld", (long long)sll);
       mrb_raise(mrb, E_RANGE_ERROR, msg);
     }
     n = sll;
   } else {
-    if (!POSFIXABLE(ull)) {
+    if (!POSFIXABLE(ui64_to_f64(ull))) {
       snprintf(msg, sizeof(msg), "cannot unpack to Fixnum: %llu", (unsigned long long)ull);
       mrb_raise(mrb, E_RANGE_ERROR, msg);
     }
@@ -295,7 +295,7 @@ static int
 pack_double(mrb_state *mrb, mrb_value o, mrb_value str, mrb_int sidx, unsigned int flags)
 {
   int i;
-  double d;
+  float64_t d;
   uint8_t *buffer = (uint8_t *)&d;
   str = str_len_ensure(mrb, str, sidx + 8);
   d = mrb_float(o);
@@ -325,7 +325,7 @@ static int
 unpack_double(mrb_state *mrb, const unsigned char * src, int srclen, mrb_value ary, unsigned int flags)
 {
   int i;
-  double d;
+  float64_t d;
   uint8_t *buffer = (uint8_t *)&d;
 
   if (flags & PACK_FLAG_LITTLEENDIAN) {
@@ -354,10 +354,10 @@ static int
 pack_float(mrb_state *mrb, mrb_value o, mrb_value str, mrb_int sidx, unsigned int flags)
 {
   int i;
-  float f;
+  float32_t f;
   uint8_t *buffer = (uint8_t *)&f;
   str = str_len_ensure(mrb, str, sidx + 4);
-  f = mrb_float(o);
+  f = f64_to_f32(mrb_float(o));
 
   if (flags & PACK_FLAG_LITTLEENDIAN) {
 #ifdef MRB_ENDIAN_BIG
@@ -384,7 +384,7 @@ static int
 unpack_float(mrb_state *mrb, const unsigned char * src, int srclen, mrb_value ary, unsigned int flags)
 {
   int i;
-  float f;
+  float32_t f;
   uint8_t *buffer = (uint8_t *)&f;
 
   if (flags & PACK_FLAG_LITTLEENDIAN) {
@@ -404,7 +404,7 @@ unpack_float(mrb_state *mrb, const unsigned char * src, int srclen, mrb_value ar
     }
 #endif
   }
-  mrb_ary_push(mrb, ary, mrb_float_value(mrb, f));
+  mrb_ary_push(mrb, ary, mrb_float_value(mrb, f32_to_f64(f)));
 
   return 4;
 }
