@@ -209,13 +209,13 @@ unpack_l(mrb_state *mrb, const unsigned char *src, int srclen, mrb_value ary, un
   }
   if (flags & PACK_FLAG_SIGNED) {
     int32_t sl = ul;
-    if (!FIXABLE(i32_to_f64(sl))) {
+    if (!TYPED_FLOAT_FIXABLE(i32_to_f64(sl))) {
       snprintf(msg, sizeof(msg), "cannot unpack to Fixnum: %ld", (long)sl);
       mrb_raise(mrb, E_RANGE_ERROR, msg);
     }
     n = sl;
   } else {
-    if (!POSFIXABLE(ui32_to_f64(ul))) {
+    if (!TYPED_FLOAT_POSFIXABLE(ui32_to_f64(ul))) {
       snprintf(msg, sizeof(msg), "cannot unpack to Fixnum: %lu", (unsigned long)ul);
       mrb_raise(mrb, E_RANGE_ERROR, msg);
     }
@@ -275,13 +275,13 @@ unpack_q(mrb_state *mrb, const unsigned char *src, int srclen, mrb_value ary, un
   }
   if (flags & PACK_FLAG_SIGNED) {
     int64_t sll = ull;
-    if (!FIXABLE(i64_to_f64(sll))) {
+    if (!TYPED_FLOAT_FIXABLE(i64_to_f64(sll))) {
       snprintf(msg, sizeof(msg), "cannot unpack to Fixnum: %lld", (long long)sll);
       mrb_raise(mrb, E_RANGE_ERROR, msg);
     }
     n = sll;
   } else {
-    if (!POSFIXABLE(ui64_to_f64(ull))) {
+    if (!TYPED_FLOAT_POSFIXABLE(ui64_to_f64(ull))) {
       snprintf(msg, sizeof(msg), "cannot unpack to Fixnum: %llu", (unsigned long long)ull);
       mrb_raise(mrb, E_RANGE_ERROR, msg);
     }
